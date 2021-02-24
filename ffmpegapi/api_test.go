@@ -138,7 +138,7 @@ func TestApplyTextEffect(t *testing.T) {
 			}
 
 			// errors.As() overwrites tc.expectedErr, so do this after checking .Error()
-			if err != nil && !errors.As(err, &tc.expectedErr) {
+			if (err != nil && !errors.As(err, &tc.expectedErr)) || (err == nil && tc.expectedErr != nil) {
 				t.Errorf("incorrect error: %s expected: %s", err, tc.expectedErr)
 			}
 
