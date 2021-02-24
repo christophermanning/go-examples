@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestResolution(t *testing.T) {
+func TestParseResolution(t *testing.T) {
 	tests := []struct {
 		label      string
 		resolution string
@@ -22,7 +22,7 @@ func TestResolution(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.label, func(t *testing.T) {
-			x, y, err := (&Video{resolution: tc.resolution}).Resolution()
+			x, y, err := (&Video{Resolution: tc.resolution}).ParseResolution()
 			if err != nil {
 				t.Errorf(err.Error())
 			}
@@ -51,19 +51,19 @@ func TestApplyTextEffect(t *testing.T) {
 		{
 			"test1: basic output",
 			&Video{
-				inputPath:  "test_input1.mp4",
-				outputPath: "test_output1.mp4",
-				duration:   "60.0",
-				resolution: "1920x1080",
+				InputPath:  "test_input1.mp4",
+				OutputPath: "test_output1.mp4",
+				Duration:   "60.0",
+				Resolution: "1920x1080",
 			},
 			&TextEffect{
-				text:      "I’m sOoOo good at this game! xD",
-				x:         200,
-				y:         100,
-				fontSize:  64,
-				fontColor: "0xFFFFFF",
-				startTime: "23.0",
-				endTime:   "40.0",
+				Text:      "I’m sOoOo good at this game! xD",
+				X:         200,
+				Y:         100,
+				FontSize:  64,
+				FontColor: "0xFFFFFF",
+				StartTime: "23.0",
+				EndTime:   "40.0",
 			},
 			`ffmpeg -i test_input1.mp4 -vf drawtext="enable='between(t,23.0,40.0)':text='I’m sOoOo good at this game! xD':fontcolor=0xFFFFFF:fontsize=64:x=200:y=100" test_output1.mp4`,
 			nil,
@@ -71,19 +71,19 @@ func TestApplyTextEffect(t *testing.T) {
 		{
 			"test2: basic output2",
 			&Video{
-				inputPath:  "test_input2.mp4",
-				outputPath: "test_output2.mp4",
-				duration:   "60.0",
-				resolution: "1920x1080",
+				InputPath:  "test_input2.mp4",
+				OutputPath: "test_output2.mp4",
+				Duration:   "60.0",
+				Resolution: "1920x1080",
 			},
 			&TextEffect{
-				text:      "Brutal, Savage, Rekt",
-				x:         0,
-				y:         0,
-				fontSize:  48,
-				fontColor: "0x000000",
-				startTime: "0.0",
-				endTime:   "60.0",
+				Text:      "Brutal, Savage, Rekt",
+				X:         0,
+				Y:         0,
+				FontSize:  48,
+				FontColor: "0x000000",
+				StartTime: "0.0",
+				EndTime:   "60.0",
 			},
 			`ffmpeg -i test_input2.mp4 -vf drawtext="enable='between(t,0.0,60.0)':text='Brutal, Savage, Rekt':fontcolor=0x000000:fontsize=48:x=0:y=0" test_output2.mp4`,
 			nil,
@@ -91,19 +91,19 @@ func TestApplyTextEffect(t *testing.T) {
 		{
 			"test3: error invalid end time",
 			&Video{
-				inputPath:  "test_input3.mp4",
-				outputPath: "test_output3.mp4",
-				duration:   "60.0",
-				resolution: "1920x1080",
+				InputPath:  "test_input3.mp4",
+				OutputPath: "test_output3.mp4",
+				Duration:   "60.0",
+				Resolution: "1920x1080",
 			},
 			&TextEffect{
-				text:      "RIP",
-				x:         100,
-				y:         200,
-				fontSize:  32,
-				fontColor: "0xFFFFFF",
-				startTime: "24.0",
-				endTime:   "75.0",
+				Text:      "RIP",
+				X:         100,
+				Y:         200,
+				FontSize:  32,
+				FontColor: "0xFFFFFF",
+				StartTime: "24.0",
+				EndTime:   "75.0",
 			},
 			``,
 			ErrVideo{Err: errors.New("Invalid End Time")},
@@ -111,19 +111,19 @@ func TestApplyTextEffect(t *testing.T) {
 		{
 			"test4: error invalid X,Y",
 			&Video{
-				inputPath:  "test_input4.mp4",
-				outputPath: "test_output4.mp4",
-				duration:   "60.0",
-				resolution: "1920x1080",
+				InputPath:  "test_input4.mp4",
+				OutputPath: "test_output4.mp4",
+				Duration:   "60.0",
+				Resolution: "1920x1080",
 			},
 			&TextEffect{
-				text:      "RIP",
-				x:         100,
-				y:         9999,
-				fontSize:  48,
-				fontColor: "0x777777",
-				startTime: "24.0",
-				endTime:   "48.0",
+				Text:      "RIP",
+				X:         100,
+				Y:         9999,
+				FontSize:  48,
+				FontColor: "0x777777",
+				StartTime: "24.0",
+				EndTime:   "48.0",
 			},
 			``,
 			ErrTextEffect{Err: errors.New("Invalid X,Y coordinate")},

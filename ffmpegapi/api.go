@@ -22,8 +22,9 @@ type ErrTextEffect struct {
 
 func (e ErrTextEffect) Error() string { return e.Err.Error() }
 
-func (v Video) Resolution() (int, int, error) {
-	parts := strings.Split(v.resolution, "x")
+func (v Video) ParseResolution() (int, int, error) {
+	// TODO add more robust parsing and error handling
+	parts := strings.Split(v.Resolution, "x")
 	if len(parts) != 2 {
 		return -1, -1, errors.New("invalid format")
 	}
@@ -41,18 +42,18 @@ func (v Video) Resolution() (int, int, error) {
 }
 
 func (v *Video) ApplyTextEffect(t *TextEffect) (string, error) {
-	if v.inputPath == "" {
+	if v.InputPath == "" {
 		// NOTE could wrap this error with `fmt.Errorf("%w: Invalid Input Path")`
 		// but the returned error message would include the top level error string
 		return "", ErrVideo{Err: errors.New("Invalid Input Path")}
 	}
 
-	tEndTime, err := strconv.ParseFloat(t.endTime, 64)
+	tEndTime, err := strconv.ParseFloat(t.EndTime, 64)
 	if err != nil {
 		return "", ErrTextEffect{Err: errors.New("Invalid End Time")}
 	}
 
-	vDuration, err := strconv.ParseFloat(v.duration, 64)
+	vDuration, err := strconv.ParseFloat(v.Duration, 64)
 	if err != nil {
 		return "", ErrVideo{Err: errors.New("Invalid Input Path")}
 	}
@@ -61,25 +62,25 @@ func (v *Video) ApplyTextEffect(t *TextEffect) (string, error) {
 		return "", ErrTextEffect{Err: errors.New("Invalid End Time")}
 	}
 
-	x, y, err := v.Resolution()
+	x, y, err := v.ParseResolution()
 	if err != nil {
 		return "", ErrTextEffect{Err: errors.New("Invalid Resolution")}
 	}
 
-	if t.x > x || t.y > y || t.x < 0 || t.y < 0 {
+	if t.X > x || t.Y > y || t.X < 0 || t.Y < 0 {
 		return "", ErrTextEffect{Err: errors.New("Invalid X,Y coordinate")}
 	}
 
 	// the drawtext value should have no spaces in it
 	return fmt.Sprintf(`ffmpeg -i %s -vf drawtext="enable='between(t,%s,%s)':text='%s':fontcolor=%s:fontsize=%d:x=%d:y=%d" %s`,
-		v.inputPath,
-		t.startTime,
-		t.endTime,
-		t.text,
-		t.fontColor,
-		t.fontSize,
-		t.x,
-		t.y,
-		v.outputPath,
+		v.InputPath,
+		t.StartTime,
+		t.EndTime,
+		t.Text,
+		t.FontColor,
+		t.FontSize,
+		t.X,
+		t.Y,
+		v.OutputPath,
 	), nil
 }
